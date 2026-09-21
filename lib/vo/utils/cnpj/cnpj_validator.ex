@@ -1,0 +1,41 @@
+defmodule Vo.Utils.Cnpj.CnpjValidator do
+  @behaviour Vo.Utils.Cnpj.CnpjBehaviour
+
+  @base_url "https://brasilapi.com.br/api"
+
+  @impl true
+  def validate(cnpj) do
+    clean_cnpj = String.replace(cnpj, ~r/[^0-9]/, "")
+
+    "#{@base_url}/cnpj/v1/#{clean_cnpj}"
+    |> HTTPoison.get()
+    |> handle_response()
+  end
+
+  defp handle_response({:ok, %HTTPoison.Response{status_code: 200, body: body}}) do
+    case Jason.decode(body) do
+      {:ok, data} -> {:ok, parse_response(data)}
+      {:error, _} -> {:error, "Error to decode API response"}
+    end
+  end
+
+  defp handle_response({:ok, %HTTPoison.Response{status_code: 404}}) do
+    {:error, "CNPJ not found"}
+  end
+
+  defp handle_response({:ok, %HTTPoison.Response{status_code: status}}) do
+    {:error, "Error in API: status #{status}"}
+  end
+
+  defp handle_response({:error, %HTTPoison.Error{reason: reason}}) do
+    {:error, "Error to call API: #{inspect(reason)}"}
+  end
+
+  defp parse_response(data) do
+    %{
+      cnpj: data["cnpj"],
+      commercial_name: data["razao_social"],
+      name: data["razao_social"]
+    }
+  end
+end

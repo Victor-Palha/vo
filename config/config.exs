@@ -9,7 +9,13 @@ import Config
 
 config :vo,
   ecto_repos: [Vo.Repo],
-  generators: [timestamp_type: :utc_datetime]
+  generators: [timestamp_type: :utc_datetime, binary_id: true]
+
+config :vo, Vo.Repo, migration_primary_key: [name: :id, type: :binary_id]
+
+config :vo,
+  cnpj_validator: Vo.Utils.Cnpj.CnpjValidator,
+  cpf_validator: Vo.Utils.Cpf.CpfValidator
 
 # Configures the endpoint
 config :vo, VoWeb.Endpoint,
