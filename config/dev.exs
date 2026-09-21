@@ -2,9 +2,10 @@ import Config
 
 # Configure your database
 config :vo, Vo.Repo,
-  username: "postgres",
-  password: "postgres",
-  hostname: "localhost",
+  username: "docker",
+  password: "docker",
+  hostname: "0.0.0.0",
+  port: 5434,
   database: "vo_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
